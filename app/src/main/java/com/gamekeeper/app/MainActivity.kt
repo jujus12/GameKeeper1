@@ -193,7 +193,19 @@ class MainActivity : Activity() {
         Thread {
             try {
                 val command = "cmd appops set $pkg RUN_IN_BACKGROUND allow; cmd appops set $pkg RUN_ANY_IN_BACKGROUND allow"
-                val process = Shizuku.newProcess(arrayOf("sh", "-c", command), null, null)
+                val processMethod = Shizuku::class.java.getDeclaredMethod(
+                    "newProcess",
+                    Array<String>::class.java,
+                    Array<String>::class.java,
+                    String::class.java
+                )
+                processMethod.isAccessible = true
+                val process = processMethod.invoke(
+                    null,
+                    arrayOf("sh", "-c", command),
+                    null,
+                    null
+                ) as Process
                 val output = process.inputStream.bufferedReader().use { it.readText() }
                 val errors = process.errorStream.bufferedReader().use { it.readText() }
                 val exitCode = process.waitFor()
